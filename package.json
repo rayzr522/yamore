@@ -16,5 +16,8 @@
   },
   "dependencies": {
     "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   }
 }
