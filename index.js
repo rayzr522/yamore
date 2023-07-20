@@ -2,8 +2,12 @@ import fs from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import YAML from 'yaml'
 
-/** @type {YAML.ToStringOptions} */
-const STRINGIFY_OPTIONS = { lineWidth: Infinity }
+/** @typedef {import('yaml').DocumentOptions &import('yaml').SchemaOptions & import('yaml').ParseOptions & import('yaml').CreateNodeOptions & import('yaml').ToStringOptions} StringifyOptions */
+/** @type {StringifyOptions} */
+const STRINGIFY_OPTIONS = {
+  lineWidth: Infinity,
+  aliasDuplicateObjects: false,
+}
 
 class IncludedFile {
   /**
@@ -34,7 +38,7 @@ function getCustomTags(baseDir) {
           str = str.slice(6)
         }
         return new IncludedFile(
-          loadFile(resolve(baseDir, str.trim())),
+          processFile(resolve(baseDir, str.trim())),
           shouldMerge,
         )
       },
@@ -102,7 +106,7 @@ export function processContents(contents, path) {
  * loads the given file with preprocessing applied
  * @param {string} path the path of the file to load
  */
-export function loadFile(path) {
+export function processFile(path) {
   const contents = fs.readFileSync(path, 'utf-8')
   return processContents(contents, path)
 }
@@ -120,7 +124,7 @@ export function loadFile(path) {
  * @returns {TransformResult} the parsed & stringified contents of the file
  */
 export function transformFile(inputPath, outputPath) {
-  const parsed = loadFile(inputPath)
+  const parsed = processFile(inputPath)
   const stringified = YAML.stringify(parsed, STRINGIFY_OPTIONS)
   fs.writeFileSync(outputPath, stringified)
   return { parsed, stringified }
