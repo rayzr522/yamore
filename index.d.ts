@@ -1,3 +1,2 @@
-declare module 'yamore' {
-  export function loadYamlFile(path: string): any
-}
+/** @param {string} path */
+export function loadYamlFile(path: string): any;
