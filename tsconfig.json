@@ -6,7 +6,8 @@
     "module": "esnext",
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
-    "checkJs": true
+    "checkJs": true,
+    "allowJs": true
   },
   "include": ["*.js"]
 }
