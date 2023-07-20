@@ -10,7 +10,8 @@
   "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublish": "pnpm build"
   },
   "exports": {
     ".": {
