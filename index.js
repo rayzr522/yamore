@@ -14,10 +14,10 @@ class IncludedFile {
 }
 
 /**
- * @param {string} path
+ * @param {string} baseDir
  * @returns {import('yaml').Tags}
  */
-function getCustomTags(path) {
+function getCustomTags(baseDir) {
   return [
     {
       tag: '!include',
@@ -31,7 +31,7 @@ function getCustomTags(path) {
           str = str.slice(6)
         }
         return new IncludedFile(
-          loadYamlFile(resolve(dirname(path), str.trim())),
+          loadFile(resolve(baseDir, str.trim())),
           shouldMerge,
         )
       },
@@ -67,12 +67,16 @@ function flattenIncludes(obj) {
 
 /** @type {Set<string>} */
 const currentlyResolving = new Set()
-/** @tpye {Map<string, unknown>} */
+/** @type {Map<string, unknown>} */
 const resolved = new Map()
 
-/** @param {string} path */
-export function loadYamlFile(path) {
-  const customTags = getCustomTags(path)
+/**
+ * processes a file, returning the parsed contents
+
+ * @param {string} contents the contents of the file
+ * @param {string} path the path of the file being processed, used to avoid circular references & for relative path resolution
+ */
+export function processContents(contents, path) {
   if (resolved.has(path)) {
     return resolved.get(path)
   }
@@ -80,12 +84,41 @@ export function loadYamlFile(path) {
     throw new Error(`Circular reference: ${path}`)
   }
   currentlyResolving.add(path)
-  const rawContents = fs.readFileSync(path, 'utf-8')
-  const withIncludesResolved = YAML.parse(rawContents, { customTags })
+
+  const customTags = getCustomTags(dirname(path))
+  const withIncludesResolved = YAML.parse(contents, { customTags })
   const flattened = flattenIncludes(withIncludesResolved)
   const reserialized = YAML.stringify(flattened)
   const merged = YAML.parse(reserialized, { merge: true })
   currentlyResolving.delete(path)
   resolved.set(path, merged)
   return merged
+}
+
+/**
+ * loads the given file with preprocessing applied
+ * @param {string} path the path of the file to load
+ */
+export function loadFile(path) {
+  const contents = fs.readFileSync(path, 'utf-8')
+  return processContents(contents, path)
+}
+
+/**
+ * @typedef {object} TransformResult
+ * @property {any} parsed the parsed contents of the file
+ * @property {string} stringified the stringified contents of the file
+ */
+
+/**
+ * preprocesses the given file & writes it back to disk
+ * @param {string} inputPath the path to load from
+ * @param {string} outputPath the path to write to
+ * @returns {TransformResult} the parsed & stringified contents of the file
+ */
+export function transformFile(inputPath, outputPath) {
+  const parsed = loadFile(inputPath)
+  const stringified = YAML.stringify(parsed)
+  fs.writeFileSync(outputPath, stringified)
+  return { parsed, stringified }
 }
