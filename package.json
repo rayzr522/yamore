@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "name": "yamore",
+  "version": "0.0.0",
+  "description": "A simple preprocessor that adds more functionality to YAML in the form of preprocessing.",
+  "author": "rayzr522 <rayzr522@gmail.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "dependencies": {
+    "yaml": "^2.3.1"
+  }
+}
