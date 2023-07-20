@@ -2,6 +2,9 @@ import fs from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import YAML from 'yaml'
 
+/** @type {YAML.ToStringOptions} */
+const STRINGIFY_OPTIONS = { lineWidth: Infinity }
+
 class IncludedFile {
   /**
    * @param {unknown} contents
@@ -88,7 +91,7 @@ export function processContents(contents, path) {
   const customTags = getCustomTags(dirname(path))
   const withIncludesResolved = YAML.parse(contents, { customTags })
   const flattened = flattenIncludes(withIncludesResolved)
-  const reserialized = YAML.stringify(flattened)
+  const reserialized = YAML.stringify(flattened, STRINGIFY_OPTIONS)
   const merged = YAML.parse(reserialized, { merge: true })
   currentlyResolving.delete(path)
   resolved.set(path, merged)
@@ -118,7 +121,7 @@ export function loadFile(path) {
  */
 export function transformFile(inputPath, outputPath) {
   const parsed = loadFile(inputPath)
-  const stringified = YAML.stringify(parsed)
+  const stringified = YAML.stringify(parsed, STRINGIFY_OPTIONS)
   fs.writeFileSync(outputPath, stringified)
   return { parsed, stringified }
 }
