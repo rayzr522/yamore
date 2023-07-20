@@ -29,6 +29,6 @@
     "typescript": "^5.1.6"
   },
   "lint-staged": {
-    "*.js": "bash -c 'pnpm build && git add *.d.ts'"
+    "*.js": "pnpm build"
   }
 }
