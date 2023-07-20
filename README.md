@@ -1,5 +1,7 @@
 # yamore
 
+[![npm version](https://badge.fury.io/js/yamore.svg)](https://npmjs.com/package/yamore)
+
 > A simple preprocessor that adds more functionality to YAML in the form of preprocessing.
 
 ## usage
